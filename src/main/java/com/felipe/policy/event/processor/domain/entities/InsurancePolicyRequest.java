@@ -3,12 +3,9 @@ package com.felipe.policy.event.processor.domain.entities;
 import com.felipe.policy.event.processor.domain.enums.InsuranceCategory;
 import com.felipe.policy.event.processor.domain.enums.InsuranceRequestStatus;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -18,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,10 +24,7 @@ public class InsurancePolicyRequest {
     private UUID id;
     private UUID customerId;
     private UUID productId;
-
-    @Enumerated(EnumType.STRING)
     private InsuranceCategory category;
-
     private String salesChannel;
     private String paymentMethod;
     private BigDecimal totalMonthlyPremiumAmount;
@@ -40,10 +33,7 @@ public class InsurancePolicyRequest {
     private List<String> assistances;
     private Instant createdAt;
     private Instant finishedAt;
-
-    @Enumerated(EnumType.STRING)
     private InsuranceRequestStatus status;
-
     private List<StatusHistory> history;
 
     public InsurancePolicyRequest(UUID customerId, UUID productId, InsuranceCategory category,
