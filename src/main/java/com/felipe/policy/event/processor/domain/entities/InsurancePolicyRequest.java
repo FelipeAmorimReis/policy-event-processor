@@ -68,6 +68,10 @@ public class InsurancePolicyRequest {
     }
 
     public void updateStatus(InsuranceRequestStatus newStatus) {
+        if (newStatus == null) {
+            throw new IllegalArgumentException("New status must not be null.");
+        }
+
         if (this.status == InsuranceRequestStatus.APPROVED ||
                 this.status == InsuranceRequestStatus.REJECTED ||
                 this.status == InsuranceRequestStatus.CANCELLED) {
