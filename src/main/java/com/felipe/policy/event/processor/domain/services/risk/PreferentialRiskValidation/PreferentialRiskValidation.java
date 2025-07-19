@@ -2,7 +2,9 @@ package com.felipe.policy.event.processor.domain.services.risk.PreferentialRiskV
 
 import com.felipe.policy.event.processor.domain.enums.InsuranceCategory;
 import com.felipe.policy.event.processor.domain.services.risk.RiskValidationStrategy.RiskValidationStrategy;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PreferentialRiskValidation implements RiskValidationStrategy {
     @Override
     public boolean isValid(InsuranceCategory category, double insuredAmount) {
