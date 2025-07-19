@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class InsuranceEventDTO {
-    private UUID requestId;
+    private UUID orderId;
     private UUID customerId;
     private InsuranceRequestStatus status;
     private Instant timestamp;

@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 public class InsurancePolicyRequestDTO {
     private UUID customerId;
-    private UUID productId;
+    private Long productId;
     private InsuranceCategory category;
     private String salesChannel;
     private String paymentMethod;

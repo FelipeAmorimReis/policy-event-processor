@@ -20,7 +20,7 @@ import java.util.UUID;
 public class InsurancePolicyResponseDTO {
     private UUID id;
     private UUID customerId;
-    private UUID productId;
+    private Long productId;
     private InsuranceCategory category;
     private String salesChannel;
     private String paymentMethod;

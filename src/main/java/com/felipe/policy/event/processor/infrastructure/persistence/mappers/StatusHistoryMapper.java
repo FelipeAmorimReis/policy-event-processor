@@ -6,8 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface StatusHistoryMapper {
-
-    StatusHistoryDTO toDto(StatusHistory status);
+    StatusHistoryDTO toDto(StatusHistory domain);
 
     StatusHistory toDomain(StatusHistoryDTO dto);
 }

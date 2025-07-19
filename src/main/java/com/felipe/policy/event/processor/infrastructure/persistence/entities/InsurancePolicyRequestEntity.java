@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -23,9 +24,12 @@ import java.util.UUID;
 public class InsurancePolicyRequestEntity {
 
     @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     private UUID customerId;
-    private UUID productId;
+    private Long productId;
 
     @Enumerated(EnumType.STRING)
     private InsuranceCategory category;
