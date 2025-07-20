@@ -4,7 +4,7 @@
     "url": "/fraud/analyze",
     "bodyPatterns": [
       {
-        "matchesJsonPath": "$[?(@.customerId=='preferential-client')]"
+        "matchesJsonPath": "$[?(@.riskKey == 3)]"
       }
     ]
   },
@@ -12,10 +12,19 @@
     "status": 200,
     "jsonBody": {
       "orderId": "{{jsonPath request.body '$.orderId'}}",
-      "customerId": "preferential-client",
+      "customerId": "{{jsonPath request.body '$.customerId'}}",
       "analyzedAt": "{{now timezone='America/Sao_Paulo' format='yyyy-MM-dd'}}T{{now timezone='America/Sao_Paulo' format='HH:mm:ssXXX'}}",
       "classification": "PREFERENTIAL",
-      "occurrences": []
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "LOYAL_CUSTOMER",
+          "description": "High-value customer with no fraud history",
+          "createdAt": "2025-06-30T10:00:00-03:00",
+          "updatedAt": "2025-07-17T10:00:00-03:00"
+        }
+      ]
     },
     "headers": {
       "Content-Type": "application/json"

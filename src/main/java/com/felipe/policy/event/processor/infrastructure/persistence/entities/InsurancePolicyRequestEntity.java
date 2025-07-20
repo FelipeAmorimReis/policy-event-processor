@@ -49,6 +49,8 @@ public class InsurancePolicyRequestEntity {
     @Enumerated(EnumType.STRING)
     private InsuranceRequestStatus status;
 
+    private Integer riskKey; //usado EXCLUSIVAMENTE apenas para controlar a classificação de risco simulada no WireMock
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "insurance_policy_request_id")
     private List<StatusHistoryEntity> history;

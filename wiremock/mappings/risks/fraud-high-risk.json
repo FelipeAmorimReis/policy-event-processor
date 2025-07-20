@@ -4,7 +4,7 @@
     "url": "/fraud/analyze",
     "bodyPatterns": [
       {
-        "matchesJsonPath": "$[?(@.customerId=='high-risk-client')]"
+        "matchesJsonPath": "$[?(@.riskKey == 1)]"
       }
     ]
   },
@@ -12,10 +12,35 @@
     "status": 200,
     "jsonBody": {
       "orderId": "{{jsonPath request.body '$.orderId'}}",
-      "customerId": "high-risk-client",
+      "customerId": "{{jsonPath request.body '$.customerId'}}",
       "analyzedAt": "{{now timezone='America/Sao_Paulo' format='yyyy-MM-dd'}}T{{now timezone='America/Sao_Paulo' format='HH:mm:ssXXX'}}",
       "classification": "HIGH_RISK",
-      "occurrences": []
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "MULTIPLE_CLAIMS",
+          "description": "Multiple claims in short period",
+          "createdAt": "2025-06-25T10:00:00-03:00",
+          "updatedAt": "2025-07-05T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "ADDRESS_MATCH",
+          "description": "Suspicious address match",
+          "createdAt": "2025-07-01T10:00:00-03:00",
+          "updatedAt": "2025-07-15T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "PREVIOUS_FRAUD",
+          "description": "Previous fraud reported",
+          "createdAt": "2025-06-10T10:00:00-03:00",
+          "updatedAt": "2025-07-19T10:00:00-03:00"
+        }
+      ]
     },
     "headers": {
       "Content-Type": "application/json"

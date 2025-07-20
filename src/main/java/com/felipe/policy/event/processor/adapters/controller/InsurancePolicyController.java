@@ -6,6 +6,7 @@ import com.felipe.policy.event.processor.application.usecases.CancelInsurancePol
 import com.felipe.policy.event.processor.application.usecases.CreateInsurancePolicyUseCase;
 import com.felipe.policy.event.processor.application.usecases.GetInsurancePolicyByIdUseCase;
 import com.felipe.policy.event.processor.application.usecases.ListPoliciesByCustomerUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class InsurancePolicyController {
     private final CancelInsurancePolicyUseCase cancelInsurancePolicyUseCase;
 
     @PostMapping
-    public ResponseEntity<InsurancePolicyResponseDTO> create(@RequestBody InsurancePolicyRequestDTO dto) {
+    public ResponseEntity<InsurancePolicyResponseDTO> create(@Valid @RequestBody InsurancePolicyRequestDTO dto) {
         InsurancePolicyResponseDTO response = createInsurancePolicyUseCase.execute(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

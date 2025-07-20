@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/fraud/analyze",
+    "bodyPatterns": [
+      {
+        "not": {
+          "matchesJsonPath": "$[?(@.riskKey >= 1 && @.riskKey <= 4)]"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 400,
+    "jsonBody": {
+      "message": "Invalid riskKey: must be between 1 and 4",
+      "code": "INVALID_RISK_KEY"
+    }
+  }
+}

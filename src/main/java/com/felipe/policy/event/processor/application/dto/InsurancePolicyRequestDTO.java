@@ -1,6 +1,8 @@
 package com.felipe.policy.event.processor.application.dto;
 
 import com.felipe.policy.event.processor.domain.enums.InsuranceCategory;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +27,8 @@ public class InsurancePolicyRequestDTO {
     private BigDecimal insuredAmount;
     private Map<String, BigDecimal> coverages;
     private List<String> assistances;
+
+    @Min(value = 1, message = "riskKey deve ser no mínimo 1")
+    @Max(value = 4, message = "riskKey deve ser no máximo 4")
+    private Integer riskKey; // usado EXCLUSIVAMENTE apenas para controlar a classificação de risco simulada no WireMock
 }

@@ -29,6 +29,7 @@ public class InsurancePolicyRequest {
     private Instant createdAt;
     private Instant finishedAt;
     private InsuranceRequestStatus status;
+    private Integer riskKey; // usado EXCLUSIVAMENTE apenas para controlar a classificação de risco simulada no WireMock
     private List<StatusHistory> history;
 
     public void updateStatus(InsuranceRequestStatus newStatus) {

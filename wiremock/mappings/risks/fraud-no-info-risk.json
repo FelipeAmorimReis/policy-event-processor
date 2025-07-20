@@ -4,7 +4,7 @@
     "url": "/fraud/analyze",
     "bodyPatterns": [
       {
-        "matchesJsonPath": "$[?(@.customerId=='no-info-client')]"
+        "matchesJsonPath": "$[?(@.riskKey == 4)]"
       }
     ]
   },
@@ -12,10 +12,43 @@
     "status": 200,
     "jsonBody": {
       "orderId": "{{jsonPath request.body '$.orderId'}}",
-      "customerId": "no-info-client",
+      "customerId": "{{jsonPath request.body '$.customerId'}}",
       "analyzedAt": "{{now timezone='America/Sao_Paulo' format='yyyy-MM-dd'}}T{{now timezone='America/Sao_Paulo' format='HH:mm:ssXXX'}}",
       "classification": "NO_INFORMATION",
-      "occurrences": []
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "NO_HISTORY",
+          "description": "No records found for this client",
+          "createdAt": "2025-05-01T10:00:00-03:00",
+          "updatedAt": "2025-05-06T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "ANONYMOUS_ACCESS",
+          "description": "Access attempt from unidentified user",
+          "createdAt": "2025-03-01T10:00:00-03:00",
+          "updatedAt": "2025-03-06T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "MISSING_DOCUMENTS",
+          "description": "Key documents not found",
+          "createdAt": "2025-07-01T10:00:00-03:00",
+          "updatedAt": "2025-07-03T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "UNUSUAL_PATTERN",
+          "description": "Behavior deviating from normal usage",
+          "createdAt": "2025-07-13T10:00:00-03:00",
+          "updatedAt": "2025-07-17T10:00:00-03:00"
+        }
+      ]
     },
     "headers": {
       "Content-Type": "application/json"

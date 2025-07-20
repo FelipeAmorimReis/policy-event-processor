@@ -4,7 +4,7 @@
     "url": "/fraud/analyze",
     "bodyPatterns": [
       {
-        "matchesJsonPath": "$[?(@.customerId=='regular-client')]"
+        "matchesJsonPath": "$[?(@.riskKey == 2)]"
       }
     ]
   },
@@ -12,10 +12,27 @@
     "status": 200,
     "jsonBody": {
       "orderId": "{{jsonPath request.body '$.orderId'}}",
-      "customerId": "regular-client",
+      "customerId": "{{jsonPath request.body '$.customerId'}}",
       "analyzedAt": "{{now timezone='America/Sao_Paulo' format='yyyy-MM-dd'}}T{{now timezone='America/Sao_Paulo' format='HH:mm:ssXXX'}}",
       "classification": "REGULAR",
-      "occurrences": []
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "INCONSISTENT_DATA",
+          "description": "Data mismatch with customer profile",
+          "createdAt": "2025-07-08T10:00:00-03:00",
+          "updatedAt": "2025-07-17T10:00:00-03:00"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "UNUSUAL_LOCATION",
+          "description": "Request made from unusual location",
+          "createdAt": "2025-07-10T10:00:00-03:00",
+          "updatedAt": "2025-07-18T10:00:00-03:00"
+        }
+      ]
     },
     "headers": {
       "Content-Type": "application/json"
