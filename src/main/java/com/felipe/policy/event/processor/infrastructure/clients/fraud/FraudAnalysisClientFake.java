@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Collections;
 
-@Component
+//@Component
+// Usado localmente
 public class FraudAnalysisClientFake implements FraudAnalysisClient {
     @Override
     public FraudAnalysisResponseDTO analyze(InsurancePolicyRequest request) {

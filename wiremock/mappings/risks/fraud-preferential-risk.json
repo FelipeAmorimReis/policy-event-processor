@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/fraud/analyze",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$[?(@.customerId=='preferential-client')]"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "orderId": "{{jsonPath request.body '$.orderId'}}",
+      "customerId": "preferential-client",
+      "analyzedAt": "{{now timezone='America/Sao_Paulo' format='yyyy-MM-dd'}}T{{now timezone='America/Sao_Paulo' format='HH:mm:ssXXX'}}",
+      "classification": "PREFERENTIAL",
+      "occurrences": []
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

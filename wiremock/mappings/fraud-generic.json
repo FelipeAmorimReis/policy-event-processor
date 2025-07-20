@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/fraud/analyze"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "orderId": "{{jsonPath request.body '$.orderId'}}",
+      "customerId": "{{jsonPath request.body '$.customerId'}}",
+      "analyzedAt": "{{now offset='0' format='yyyy-MM-dd\\'T\\'HH:mm:ss\\'Z\\''}}",
+      "classification": "HIGH_RISK",
+      "occurrences": [
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "MULTIPLE_CLAIMS",
+          "description": "Multiple claims in short period",
+          "createdAt": "{{now offset='-10d' format='yyyy-MM-dd\\'T\\'HH:mm:ss\\'Z\\''}}",
+          "updatedAt": "{{now offset='-1d' format='yyyy-MM-dd\\'T\\'HH:mm:ss\\'Z\\''}}"
+        },
+        {
+          "id": "{{randomValue type='UUID'}}",
+          "productId": "{{jsonPath request.body '$.productId'}}",
+          "type": "ADDRESS_MATCH",
+          "description": "Suspicious address match",
+          "createdAt": "{{now offset='-5d' format='yyyy-MM-dd\\'T\\'HH:mm:ss\\'Z\\''}}",
+          "updatedAt": "{{now offset='-1d' format='yyyy-MM-dd\\'T\\'HH:mm:ss\\'Z\\''}}"
+        }
+      ]
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
