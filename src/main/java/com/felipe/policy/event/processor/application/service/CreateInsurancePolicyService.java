@@ -1,9 +1,8 @@
 package com.felipe.policy.event.processor.application.service;
 
-import com.felipe.policy.event.processor.application.dto.FraudAnalysisResponseDTO;
-import com.felipe.policy.event.processor.application.dto.InsurancePolicyRequestDTO;
-import com.felipe.policy.event.processor.application.dto.InsurancePolicyResponseDTO;
-import com.felipe.policy.event.processor.application.exception.BusinessException;
+import com.felipe.policy.event.processor.application.dto.response.FraudAnalysisResponseDTO;
+import com.felipe.policy.event.processor.application.dto.request.InsurancePolicyRequestDTO;
+import com.felipe.policy.event.processor.application.dto.response.InsurancePolicyResponseDTO;
 import com.felipe.policy.event.processor.application.usecases.CreateInsurancePolicyUseCase;
 import com.felipe.policy.event.processor.domain.entities.InsurancePolicyRequest;
 import com.felipe.policy.event.processor.domain.entities.StatusHistory;
@@ -21,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -37,38 +36,51 @@ public class CreateInsurancePolicyService implements CreateInsurancePolicyUseCas
 
     @Override
     public InsurancePolicyResponseDTO execute(InsurancePolicyRequestDTO dto) {
-        // 1. Mapear DTO -> Domínio
+        // 1. Mapea DTO → Domínio
         InsurancePolicyRequest domain = mapper.toDomain(dto);
+        Instant now = Instant.now();
 
-        domain.setCreatedAt(Instant.now());
-        domain.setStatus(InsuranceRequestStatus.RECEIVED);
-        domain.setHistory(List.of(new StatusHistory(domain.getStatus(), domain.getCreatedAt())));
+        domain.setCreatedAt(now);
+        updateStatus(domain, InsuranceRequestStatus.RECEIVED, now);
 
-        // 2. Chamada à API de fraude (mock)
+        // 2. Analisa risco (via mock API)
         FraudAnalysisResponseDTO fraudResponse = fraudAnalysisClient.analyze(domain);
         RiskClassification classification = fraudResponse.getClassification();
 
-        // 3. Validação de risco com contexto de estratégia
+        // 3. Validar risco com strategy
         boolean isValid = riskValidationContext.validate(
                 classification,
                 domain.getCategory(),
                 domain.getInsuredAmount().doubleValue()
         );
 
-        if (!isValid) {
-            log.warn("Solicitação com risco inválido: {}", classification);
-            throw new BusinessException("Risk validation failed");
+        if (isValid) {
+            updateStatus(domain, InsuranceRequestStatus.VALIDATED);
+            updateStatus(domain, InsuranceRequestStatus.PENDING);
+        } else {
+            updateStatus(domain, InsuranceRequestStatus.REJECTED);
         }
 
-        // 4. Persistir (Domínio -> Entidade)
+        // 4. Persiste dados
         InsurancePolicyRequestEntity entity = persistenceMapper.toEntity(domain);
         InsurancePolicyRequestEntity savedEntity = repository.save(entity);
 
-        // 5. Publicar evento
-        log.info("Simulando envio de evento para Kafka: {}", savedEntity);
-        // eventPublisher.publish(savedEntity); // Ative quando Kafka estiver ok
+        // 5. Publica evento (Kafka)
+        eventPublisher.publish(savedEntity);
 
-        // 6. Retornar resposta (Entidade → Domínio → DTO de resposta)
+        // 6. Mapea retorno
         return mapper.toResponseDTO(persistenceMapper.toDomain(savedEntity));
+    }
+
+    private void updateStatus(InsurancePolicyRequest domain, InsuranceRequestStatus newStatus) {
+        updateStatus(domain, newStatus, Instant.now());
+    }
+
+    private void updateStatus(InsurancePolicyRequest domain, InsuranceRequestStatus newStatus, Instant timestamp) {
+        if (domain.getHistory() == null) {
+            domain.setHistory(new ArrayList<>());
+        }
+        domain.setStatus(newStatus);
+        domain.getHistory().add(new StatusHistory(newStatus, timestamp));
     }
 }

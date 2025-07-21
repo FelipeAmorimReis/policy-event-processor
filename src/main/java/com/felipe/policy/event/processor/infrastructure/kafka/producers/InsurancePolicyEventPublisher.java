@@ -1,6 +1,6 @@
 package com.felipe.policy.event.processor.infrastructure.kafka.producers;
 
-import com.felipe.policy.event.processor.application.dto.InsuranceEventDTO;
+import com.felipe.policy.event.processor.application.dto.response.InsuranceEventDTO;
 import com.felipe.policy.event.processor.infrastructure.persistence.entities.InsurancePolicyRequestEntity;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +24,6 @@ public class InsurancePolicyEventPublisher {
                 .timestamp(entity.getCreatedAt())
                 .build();
 
-        kafkaTemplate.send("insurance-policy-created", event);
+        kafkaTemplate.send("insurance-policy-events", event);
     }
 }

@@ -23,4 +23,9 @@ public class StatusHistoryEntity {
     private InsuranceRequestStatus status;
 
     private Instant timestamp;
+
+    public StatusHistoryEntity(InsuranceRequestStatus status, Instant timestamp) {
+        this.status = status;
+        this.timestamp = timestamp;
+    }
 }

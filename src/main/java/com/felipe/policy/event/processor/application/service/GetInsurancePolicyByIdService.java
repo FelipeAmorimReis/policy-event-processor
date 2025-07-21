@@ -1,6 +1,6 @@
 package com.felipe.policy.event.processor.application.service;
 
-import com.felipe.policy.event.processor.application.dto.InsurancePolicyResponseDTO;
+import com.felipe.policy.event.processor.application.dto.response.InsurancePolicyResponseDTO;
 import com.felipe.policy.event.processor.application.usecases.GetInsurancePolicyByIdUseCase;
 import com.felipe.policy.event.processor.infrastructure.persistence.mappers.InsurancePolicyMapper;
 import com.felipe.policy.event.processor.infrastructure.persistence.mappers.InsurancePolicyPersistenceMapper;

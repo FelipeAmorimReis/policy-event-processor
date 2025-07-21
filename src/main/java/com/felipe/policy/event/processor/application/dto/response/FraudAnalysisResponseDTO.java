@@ -1,4 +1,4 @@
-package com.felipe.policy.event.processor.application.dto;
+package com.felipe.policy.event.processor.application.dto.response;
 
 import com.felipe.policy.event.processor.domain.enums.RiskClassification;
 import lombok.AllArgsConstructor;

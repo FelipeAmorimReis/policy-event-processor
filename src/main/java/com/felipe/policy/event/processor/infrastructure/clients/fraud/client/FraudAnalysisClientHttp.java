@@ -1,6 +1,6 @@
 package com.felipe.policy.event.processor.infrastructure.clients.fraud.client;
 
-import com.felipe.policy.event.processor.application.dto.FraudAnalysisResponseDTO;
+import com.felipe.policy.event.processor.application.dto.response.FraudAnalysisResponseDTO;
 import com.felipe.policy.event.processor.application.exception.FraudAnalysisException;
 import com.felipe.policy.event.processor.application.exception.InvalidRiskKeyException;
 import com.felipe.policy.event.processor.domain.entities.InsurancePolicyRequest;

@@ -1,14 +1,14 @@
-package com.felipe.policy.event.processor.application.dto;
+package com.felipe.policy.event.processor.application.dto.request;
 
 import com.felipe.policy.event.processor.domain.enums.InsuranceCategory;
-import com.felipe.policy.event.processor.domain.enums.InsuranceRequestStatus;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,19 +17,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InsurancePolicyResponseDTO {
-    private UUID id;
+public class InsurancePolicyRequestDTO {
     private UUID customerId;
     private Long productId;
     private InsuranceCategory category;
     private String salesChannel;
     private String paymentMethod;
-    private InsuranceRequestStatus status;
-    private Instant createdAt;
-    private Instant finishedAt;
     private BigDecimal totalMonthlyPremiumAmount;
     private BigDecimal insuredAmount;
     private Map<String, BigDecimal> coverages;
     private List<String> assistances;
-    private List<StatusHistoryDTO> history;
+
+    @Min(value = 1, message = "riskKey deve ser no mínimo 1")
+    @Max(value = 4, message = "riskKey deve ser no máximo 4")
+    private Integer riskKey; // usado EXCLUSIVAMENTE apenas para controlar a classificação de risco simulada no WireMock
 }

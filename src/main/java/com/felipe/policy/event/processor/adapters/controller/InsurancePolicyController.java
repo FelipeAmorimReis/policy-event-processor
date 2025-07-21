@@ -1,18 +1,19 @@
 package com.felipe.policy.event.processor.adapters.controller;
 
-import com.felipe.policy.event.processor.application.dto.InsurancePolicyRequestDTO;
-import com.felipe.policy.event.processor.application.dto.InsurancePolicyResponseDTO;
+import com.felipe.policy.event.processor.application.dto.response.CancelPolicyResponseDTO;
+import com.felipe.policy.event.processor.application.dto.request.InsurancePolicyRequestDTO;
+import com.felipe.policy.event.processor.application.dto.response.InsurancePolicyResponseDTO;
+import com.felipe.policy.event.processor.application.dto.response.ReprocessPolicyResponseDTO;
 import com.felipe.policy.event.processor.application.usecases.CancelInsurancePolicyUseCase;
 import com.felipe.policy.event.processor.application.usecases.CreateInsurancePolicyUseCase;
 import com.felipe.policy.event.processor.application.usecases.GetInsurancePolicyByIdUseCase;
-import com.felipe.policy.event.processor.application.usecases.ListPoliciesByCustomerUseCase;
+import com.felipe.policy.event.processor.application.usecases.ReprocessInsurancePolicyUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +25,9 @@ public class InsurancePolicyController {
 
     private final GetInsurancePolicyByIdUseCase getInsurancePolicyByIdUseCase;
 
-    private final ListPoliciesByCustomerUseCase listPoliciesByCustomerUseCase;
-
     private final CancelInsurancePolicyUseCase cancelInsurancePolicyUseCase;
+
+    private final ReprocessInsurancePolicyUseCase reprocessInsurancePolicyUseCase;
 
     @PostMapping
     public ResponseEntity<InsurancePolicyResponseDTO> create(@Valid @RequestBody InsurancePolicyRequestDTO dto) {
@@ -40,15 +41,15 @@ public class InsurancePolicyController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<InsurancePolicyResponseDTO>> getByCustomer(@PathVariable UUID customerId) {
-        List<InsurancePolicyResponseDTO> response = listPoliciesByCustomerUseCase.execute(customerId);
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<CancelPolicyResponseDTO> cancel(@PathVariable UUID id) {
+        CancelPolicyResponseDTO response = cancelInsurancePolicyUseCase.execute(id);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelPolicy(@PathVariable UUID id) {
-        cancelInsurancePolicyUseCase.execute(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/{id}/reprocess")
+    public ResponseEntity<ReprocessPolicyResponseDTO> reprocess(@PathVariable UUID id) {
+        ReprocessPolicyResponseDTO response = reprocessInsurancePolicyUseCase.execute(id);
+        return ResponseEntity.ok(response);
     }
 }
