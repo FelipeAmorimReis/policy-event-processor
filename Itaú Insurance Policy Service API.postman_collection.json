@@ -1,0 +1,302 @@
+{
+	"info": {
+		"_postman_id": "119086de-f663-4544-a48b-314bbd0904f8",
+		"name": "Itaú Insurance Policy Service API",
+		"description": "Coleção de testes do desafio técnico Itaú - microsserviço de apólices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46901739"
+	},
+	"item": [
+		{
+			"name": "API Externa - Kafka",
+			"item": [
+				{
+					"name": "Cenário Aprovado",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"paymentStatus\": \"{{paymentStatusSuccess}}\",\n  \"subscriptionStatus\": \"{{subscriptionStatusSuccess}}\",\n  \"analyzedAt\": \"{{analyzedAt}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/kafka/simulate-payment-result",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kafka",
+								"simulate-payment-result"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cenário Rejeitado (subscrição DENIED)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"paymentStatus\": \"{{paymentStatusSuccess}}\",\n  \"subscriptionStatus\": \"{{subscriptionStatusDenied}}\",\n  \"analyzedAt\": \"{{analyzedAt}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/kafka/simulate-payment-result",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"kafka",
+								"simulate-payment-result"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cenário Rejeitado (pagamento REJECTED)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"{{order_id}}\",\r\n  \"paymentStatus\": \"{{paymentStatusDenied}}\",\r\n  \"subscriptionStatus\": \"{{subscriptionStatusSuccess}}\",\r\n  \"analyzedAt\": \"{{analyzedAt}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/kafka/simulate-payment-result",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"kafka",
+								"simulate-payment-result"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cenário Rejeitado (ambos negados)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"{{order_id}}\",\r\n  \"paymentStatus\": \"{{paymentStatusDenied}}\",\r\n  \"subscriptionStatus\": \"{{subscriptionStatusDenied}}\",\r\n  \"analyzedAt\": \"{{analyzedAt}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/kafka/simulate-payment-result",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"kafka",
+								"simulate-payment-result"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Policy by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies/{{order_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies",
+						"{{order_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Policy - Sucess",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Extrai o orderId e salva em variável de ambiente\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.environment.set(\"order_id\", jsonData.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": \"4e2433c3-d1b9-4d18-a8d9-abcde1234567\",\n  \"productId\": 98765,\n  \"category\": \"LIFE\",\n  \"salesChannel\": \"ONLINE\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"totalMonthlyPremiumAmount\": 120.50,\n  \"insuredAmount\": 100000.00,\n  \"riskKey\": 2,\n  \"coverages\": {\n    \"DEATH\": 50000.00,\n    \"DISABILITY\": 50000.00\n  },\n  \"assistances\": [\n    \"24H_MEDICAL_SUPPORT\",\n    \"FUNERAL_ASSISTANCE\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Policy - Rejected",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Extrai o orderId e salva em variável de ambiente\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.environment.set(\"order_id\", jsonData.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": \"4e2433c3-d1b9-4d18-a8d9-abcde1234567\",\n  \"productId\": 98765,\n  \"category\": \"AUTO\",\n  \"salesChannel\": \"ONLINE\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"totalMonthlyPremiumAmount\": 120.50,\n  \"insuredAmount\": 90000000.00,\n  \"riskKey\": 2,\n  \"coverages\": {\n    \"DEATH\": 50000.00,\n    \"DISABILITY\": 50000.00\n  },\n  \"assistances\": [\n    \"24H_MEDICAL_SUPPORT\",\n    \"FUNERAL_ASSISTANCE\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reprocess Policy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies/{{order_id}}/reprocess",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies",
+						"{{order_id}}",
+						"reprocess"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Policy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies/{{order_id}}/cancel",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies",
+						"{{order_id}}",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Policy with Invalid RiskKey",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerId\": \"4e2433c3-d1b9-4d18-a8d9-abcde1234567\",\r\n  \"productId\": 98765,\r\n  \"category\": \"LIFE\",\r\n  \"salesChannel\": \"ONLINE\",\r\n  \"paymentMethod\": \"CREDIT_CARD\",\r\n  \"totalMonthlyPremiumAmount\": 120.50,\r\n  \"insuredAmount\": 100000.00,\r\n  \"riskKey\": 5,\r\n  \"coverages\": {\r\n    \"DEATH\": 50000.00,\r\n    \"DISABILITY\": 50000.00\r\n  },\r\n  \"assistances\": [\r\n    \"24H_MEDICAL_SUPPORT\",\r\n    \"FUNERAL_ASSISTANCE\"\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/insurance-policies",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"insurance-policies"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
