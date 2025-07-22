@@ -70,7 +70,6 @@ Os cenários cobrem:
 
 - Criação de apólice com risco simulado
 - Consulta por ID
-- Consulta por cliente
 - Cancelamento
 - Reprocessamento de eventos
 - Gatilho de eventos Kafka simulando pagamento e autorização
@@ -82,8 +81,7 @@ Os cenários cobrem:
 1. Cliente realiza solicitação de apólice via `POST /api/insurance-policies`
 2. API envia os dados para a API de Fraudes (mock via WireMock)
 3. O retorno é analisado por uma estratégia que aplica regras baseadas na classificação de risco
-4. Evento Kafka é publicado com o status atual
-5. A própria aplicação, ao consumir eventos de Kafka (simulando pagamento/autorização), reprocessa a apólice alterando o status para `APPROVED` ou mantendo como `REJECTED`
+4. A própria aplicação, ao consumir eventos de Kafka (simulando pagamento/autorização), altera a apólice alterando o status para `APPROVED` ou como `REJECTED`
 
 ---
 
