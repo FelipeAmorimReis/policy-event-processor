@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CancelPolicyResponseDTO {
-
-    private UUID orderId;
     private String message;
     private String status;
     private Instant timestamp;

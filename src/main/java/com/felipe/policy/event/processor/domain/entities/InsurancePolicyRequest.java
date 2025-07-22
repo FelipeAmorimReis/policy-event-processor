@@ -1,14 +1,23 @@
 package com.felipe.policy.event.processor.domain.entities;
 
+import com.felipe.policy.event.processor.application.exceptions.InvalidPolicyStatusException;
+import com.felipe.policy.event.processor.application.exceptions.InvalidRequestException;
 import com.felipe.policy.event.processor.domain.enums.InsuranceCategory;
 import com.felipe.policy.event.processor.domain.enums.InsuranceRequestStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.felipe.policy.event.processor.application.constants.MessageConstants.STATUS_CANNOT_BE_NULL;
+import static com.felipe.policy.event.processor.application.constants.MessageConstants.STATUS_CANNOT_CHANGE_AFTER_FINAL;
 
 @Data
 @NoArgsConstructor
@@ -34,18 +43,18 @@ public class InsurancePolicyRequest {
 
     public void updateStatus(InsuranceRequestStatus newStatus) {
         if (newStatus == null) {
-            throw new IllegalArgumentException("New status must not be null.");
+            throw new InvalidRequestException(STATUS_CANNOT_BE_NULL);
         }
 
         if (this.status == InsuranceRequestStatus.APPROVED ||
                 this.status == InsuranceRequestStatus.REJECTED ||
                 this.status == InsuranceRequestStatus.CANCELLED) {
-            throw new IllegalStateException("Cannot change status after final state.");
+            throw new InvalidPolicyStatusException(STATUS_CANNOT_CHANGE_AFTER_FINAL);
         }
 
         this.status = newStatus;
         Instant now = Instant.now();
-        this.history.add(new StatusHistory(newStatus, now));
+        getHistory().add(new StatusHistory(newStatus, now));
 
         if (newStatus == InsuranceRequestStatus.APPROVED ||
                 newStatus == InsuranceRequestStatus.REJECTED ||
@@ -54,4 +63,10 @@ public class InsurancePolicyRequest {
         }
     }
 
+    public List<StatusHistory> getHistory() {
+        if (history == null) {
+            history = new ArrayList<>();
+        }
+        return history;
+    }
 }

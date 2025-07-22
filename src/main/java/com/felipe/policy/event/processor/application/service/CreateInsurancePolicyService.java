@@ -1,17 +1,17 @@
 package com.felipe.policy.event.processor.application.service;
 
-import com.felipe.policy.event.processor.application.dto.response.FraudAnalysisResponseDTO;
 import com.felipe.policy.event.processor.application.dto.request.InsurancePolicyRequestDTO;
+import com.felipe.policy.event.processor.application.dto.response.FraudAnalysisResponseDTO;
 import com.felipe.policy.event.processor.application.dto.response.InsurancePolicyResponseDTO;
 import com.felipe.policy.event.processor.application.usecases.CreateInsurancePolicyUseCase;
 import com.felipe.policy.event.processor.domain.entities.InsurancePolicyRequest;
-import com.felipe.policy.event.processor.domain.entities.StatusHistory;
 import com.felipe.policy.event.processor.domain.enums.InsuranceRequestStatus;
 import com.felipe.policy.event.processor.domain.enums.RiskClassification;
 import com.felipe.policy.event.processor.domain.services.risk.RiskValidationContext;
 import com.felipe.policy.event.processor.infrastructure.clients.fraud.FraudAnalysisClient;
 import com.felipe.policy.event.processor.infrastructure.kafka.producers.InsurancePolicyEventPublisher;
 import com.felipe.policy.event.processor.infrastructure.persistence.entities.InsurancePolicyRequestEntity;
+import com.felipe.policy.event.processor.infrastructure.persistence.entities.StatusHistoryEntity;
 import com.felipe.policy.event.processor.infrastructure.persistence.mappers.InsurancePolicyMapper;
 import com.felipe.policy.event.processor.infrastructure.persistence.mappers.InsurancePolicyPersistenceMapper;
 import com.felipe.policy.event.processor.infrastructure.persistence.repositories.InsurancePolicyRequestRepository;
@@ -20,7 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
+
+import static com.felipe.policy.event.processor.application.constants.MessageConstants.LOG_KAFKA_EVENT_PUBLISHED;
 
 @Service
 @RequiredArgsConstructor
@@ -36,51 +37,40 @@ public class CreateInsurancePolicyService implements CreateInsurancePolicyUseCas
 
     @Override
     public InsurancePolicyResponseDTO execute(InsurancePolicyRequestDTO dto) {
-        // 1. Mapea DTO → Domínio
         InsurancePolicyRequest domain = mapper.toDomain(dto);
-        Instant now = Instant.now();
+        domain.setCreatedAt(Instant.now());
+        domain.updateStatus(InsuranceRequestStatus.RECEIVED);
 
-        domain.setCreatedAt(now);
-        updateStatus(domain, InsuranceRequestStatus.RECEIVED, now);
+        // Salvar e publicar após RECEIVED
+        InsurancePolicyRequestEntity entity = repository.save(persistenceMapper.toEntity(domain));
+        publishStatus(entity);
 
-        // 2. Analisa risco (via mock API)
         FraudAnalysisResponseDTO fraudResponse = fraudAnalysisClient.analyze(domain);
         RiskClassification classification = fraudResponse.getClassification();
 
-        // 3. Validar risco com strategy
-        boolean isValid = riskValidationContext.validate(
-                classification,
-                domain.getCategory(),
-                domain.getInsuredAmount().doubleValue()
-        );
+        if (riskValidationContext.validate(classification, domain.getCategory(), domain.getInsuredAmount().doubleValue())) {
+            entity.setStatus(InsuranceRequestStatus.VALIDATED);
+            entity.getHistory().add(new StatusHistoryEntity(InsuranceRequestStatus.VALIDATED, Instant.now()));
+            entity = repository.save(entity);
+            publishStatus(entity);
 
-        if (isValid) {
-            updateStatus(domain, InsuranceRequestStatus.VALIDATED);
-            updateStatus(domain, InsuranceRequestStatus.PENDING);
+            entity.setStatus(InsuranceRequestStatus.PENDING);
+            entity.getHistory().add(new StatusHistoryEntity(InsuranceRequestStatus.PENDING, Instant.now()));
+            entity = repository.save(entity);
+            publishStatus(entity);
         } else {
-            updateStatus(domain, InsuranceRequestStatus.REJECTED);
+            entity.setStatus(InsuranceRequestStatus.REJECTED);
+            entity.setFinishedAt(Instant.now());
+            entity.getHistory().add(new StatusHistoryEntity(InsuranceRequestStatus.REJECTED, Instant.now()));
+            entity = repository.save(entity);
+            publishStatus(entity);
         }
 
-        // 4. Persiste dados
-        InsurancePolicyRequestEntity entity = persistenceMapper.toEntity(domain);
-        InsurancePolicyRequestEntity savedEntity = repository.save(entity);
-
-        // 5. Publica evento (Kafka)
-        eventPublisher.publish(savedEntity);
-
-        // 6. Mapea retorno
-        return mapper.toResponseDTO(persistenceMapper.toDomain(savedEntity));
+        return mapper.toResponseDTO(persistenceMapper.toDomain(entity));
     }
 
-    private void updateStatus(InsurancePolicyRequest domain, InsuranceRequestStatus newStatus) {
-        updateStatus(domain, newStatus, Instant.now());
-    }
-
-    private void updateStatus(InsurancePolicyRequest domain, InsuranceRequestStatus newStatus, Instant timestamp) {
-        if (domain.getHistory() == null) {
-            domain.setHistory(new ArrayList<>());
-        }
-        domain.setStatus(newStatus);
-        domain.getHistory().add(new StatusHistory(newStatus, timestamp));
+    private void publishStatus(InsurancePolicyRequestEntity entity) {
+        log.info(LOG_KAFKA_EVENT_PUBLISHED, entity.getId(), entity.getStatus());
+        eventPublisher.publish(entity);
     }
 }

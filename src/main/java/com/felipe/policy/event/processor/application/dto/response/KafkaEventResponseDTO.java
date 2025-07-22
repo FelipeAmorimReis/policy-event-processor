@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class KafkaEventResponseDTO {
-    private UUID orderId;
     private String status;
     private String message;
     private Instant timestamp;
