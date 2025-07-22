@@ -6,7 +6,6 @@ import com.felipe.policy.event.processor.application.dto.response.ReprocessPolic
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import static com.felipe.policy.event.processor.application.constants.MessageConstants.*;
 

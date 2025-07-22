@@ -4,5 +4,6 @@ public enum InsuranceCategory {
     AUTO,
     RESIDENTIAL,
     LIFE,
+    OTHER,
 
 }
